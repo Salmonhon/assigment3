@@ -7,16 +7,14 @@ Post
 
 <section class="container p-3 mb-2 bg-secondary text-white">
   <form  method="POST">
-    {{ form.csrf_token() }}
-    
-  {% for i in news %}
+
+    {% for i in news %}
   <div class="col-12">
     <div class="row">
       <div class="col">
         <h2 class="fw-bold float-start"><a href="#">{{ i.title }}</a></h2>
       </div>
     </div>
-    {{ form.author_id(value=i.author.id) }}
     <h5>{{ i.intro }}</h5>
     <div class="row">
       <div class="col">
@@ -29,18 +27,21 @@ Post
         </p>
       </div>
     </div>
-    {% if i.author.id != id %}
-      {{ form.submit(class='btn btn-secondary') }}
-    {% endif %}
-    {% for a in follower_id %}
-      {% if i.author.id != a %}
-       {{ form.submit(class='btn btn-secondary') }}
-          {% endif %}
-      {% endfor %}
+
+     {{ form.csrf_token() }}
+    {{ form.author_id(value=i.author.id) }}
+    {% if i.author.id == id %}
+      <button class="btn btn-secondary">Your post</button>
+
+    {% elif i.author.id in followers_id %}
+        <button class="btn btn-secondary">Followed</button>
+    {% else %}
+        {{ form.submit(class='btn btn-secondary') }}
+      {% endif %}
 
 
 
-    <p class="fs-5 fst-italic text-end  author"><a href="#">{{ i.author.sname }}</a></p>
+    <p class="fs-5 fst-italic text-end  author"><a href="#">{{ i.author.id }}</a></p>
   
   </div>
   <hr>

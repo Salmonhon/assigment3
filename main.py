@@ -40,28 +40,6 @@ def add_article():
         return redirect('/')
 
 
-@app.route("/post", methods=['GET','POST'])
-def post():
-    form = SubscribeForm()
-    author_login = Author.query.filter_by(id=session.get('id')).first()
-    news = News.query.all()
-    id = author_login.id
-    # sub = Author.query.filter_by(author_login).all()
-    print(author_login)
-    if form.validate_on_submit():
-        a = Author.query.filter_by(id=form.author_id.data).first()
-        print(author_login)
-        print(a)
-        # a.subscribes.append(author_login)
-        author_login.subscribes.append(a)
-        print(author_login.subscribes)
-        db.session.commit()
-    followers_id = []
-    for i in author_login.subscribes:
-        followers_id.append(i.id)
-
-
-    return render_template("post.html", news=news, form=form, id=id, followers_id=followers_id)
 
 
 
@@ -93,17 +71,40 @@ def regist():
         return render_template('parent.html', message='signup done!')
     return render_template("regist.html", form=form)
 
+@app.route("/post", methods=['GET','POST'])
+def post():
+    form = SubscribeForm()
+    author_login = Author.query.filter_by(id=session.get('id')).first()
+    news = News.query.all()
+    id = author_login.id
+    # sub = Author.query.filter_by(author_login).all()
+    print(author_login)
+    if form.validate_on_submit():
+        a = Author.query.filter_by(id=form.author_id.data).first()
+        # a.subscribes.append(author_login)
+        author_login.subscribes.append(a)
+        db.session.commit()
+    followers_id = []
+    for i in author_login.subscribes:
+        followers_id.append(i.id)
+    print(author_login.subscribes,"count")
 
-@app.route("/subscriptions")
+    return render_template("post.html", news=news, form=form, id=id, followers_id=followers_id)
+
+
+
+@app.route("/subscriptions", methods=['GET', 'POST'])
 def subscriptions():
     author_login = Author.query.filter_by(id=session.get('id')).first()
     followers_id = []
     for i in author_login.subscribes:
         followers_id.append(i.id)
+        print(i.id,"qwert")
+        news = News.query.filter(News.author_id.in_(followers_id)).all()
+    print(author_login.subscribes,"chislo podpisok")
 
-
-    news = News.query.filter(News.author_id.in_(followers_id)).all()
     print(news)
+
     return render_template("my_subscriptions.html", news=news)
 
 
